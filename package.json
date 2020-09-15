@@ -2,6 +2,9 @@
   "name": "frontend-project-lvl2",
   "version": "1.0.0",
   "description": "",
+  "bin": {
+    "gendiff": "/bin/gendiff.js"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,5 +23,8 @@
     "eslint": "^7.9.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0"
+  },
+  "dependencies": {
+    "commander": "^6.1.0"
   }
 }
