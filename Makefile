@@ -7,5 +7,5 @@ publish:
 lint:
 	npx eslint .
 
-gendiff -h:
+gendiff:
 	node bin/gendiff.js --help
