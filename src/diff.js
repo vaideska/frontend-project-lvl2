@@ -1,7 +1,6 @@
 import fs from 'fs';
 
 const diffFiles = (filepath1, filepath2) => {
-  console.log(__dirname);
   /* const jsonText1 = fs.readFileSync
   ('C:\\programming\\frontend-project-lvl2\\test\\file1.JSON', 'utf8');
   const jsonText2 = fs.readFileSync
