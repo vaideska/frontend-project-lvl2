@@ -26,6 +26,7 @@
     "eslint-plugin-import": "^2.22.0"
   },
   "dependencies": {
-    "commander": "^6.2.0"
+    "commander": "^6.2.0",
+    "lodash": "^4.17.20"
   }
 }
