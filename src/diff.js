@@ -1,25 +1,33 @@
 import _ from 'lodash';
 import getObject from './parsers.js';
 
+const getStringResult = (arr) => {
+  const result = arr.reduce((acc, a) => `${acc}  ${a[0]} ${a[1]}: ${a[2]}\n`, '{\n');
+  return `${result}}`;
+};
+
 const diffFlatObject = (obj1, obj2) => {
   const getResultObj1 = (acc, key) => {
     const value = obj1[key];
-    let res = acc;
+    const res = acc;
     if (_.has(obj2, key)) {
-      if (value === obj2[key]) res += `    ${key}: ${value}\n`;
-      else res += `  - ${key}: ${value}\n  + ${key}: ${obj2[key]}\n`;
-    } else res += `  - ${key}: ${value}\n`;
+      if (value === obj2[key]) res.push([' ', key, value]);
+      else {
+        res.push(['-', key, value]);
+        res.push(['+', key, obj2[key]]);
+      }
+    } else res.push(['-', key, value]);
     return res;
   };
 
   const getResultObj2 = (acc, key) => {
     const value = obj2[key];
-    let res = acc;
-    if (!(_.has(obj1, key))) res += `  + ${key}: ${value}\n`;
+    const res = acc;
+    if (!(_.has(obj1, key))) res.push(['+', key, value]);
     return res;
   };
 
-  let result = '';
+  let result = [];
   let keysObj1 = Object.keys(obj1);
   let keysObj2 = Object.keys(obj2);
   keysObj1 = keysObj1.sort();
@@ -38,9 +46,9 @@ const diffFiles = (filepath1, filepath2) => {
   } catch (e) {
     return e;
   }
-  const result = `{\n${diffFlatObject(obj1, obj2)}}`;
+  const result = diffFlatObject(obj1, obj2);
 
-  return result;
+  return getStringResult(result);
 };
 
 export default diffFiles;
