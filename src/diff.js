@@ -2,38 +2,51 @@ import _ from 'lodash';
 import getObject from './parsers.js';
 
 const getStringResult = (arr) => {
-  const result = arr.reduce((acc, a) => `${acc}  ${a[0]} ${a[1]}: ${a[2]}\n`, '{\n');
+  const result = arr.reduce((acc, a) => {
+    switch (a.mod) {
+      case 'unchanged':
+        return `${acc}    ${a.key}: ${a.value}\n`;
+      case 'added':
+        return `${acc}  + ${a.key}: ${a.value}\n`;
+      case 'deleted':
+        return `${acc}  - ${a.key}: ${a.value}\n`;
+      default:
+        return null;
+    }
+  }, '{\n');
   return `${result}}`;
 };
 
 const diffFlatObject = (obj1, obj2) => {
-  const getResultObj1 = (acc, key) => {
-    const value = obj1[key];
-    const res = acc;
-    if (_.has(obj2, key)) {
-      if (value === obj2[key]) res.push([' ', key, value]);
-      else {
-        res.push(['-', key, value]);
-        res.push(['+', key, obj2[key]]);
-      }
-    } else res.push(['-', key, value]);
-    return res;
-  };
+  const obj = { ...obj2 };
+  _.merge(obj, obj1);
+  console.log(obj);
 
-  const getResultObj2 = (acc, key) => {
-    const value = obj2[key];
-    const res = acc;
-    if (!(_.has(obj1, key))) res.push(['+', key, value]);
-    return res;
+  const getResultObj = (acc, key) => {
+    const value1 = obj1[key];
+    const value2 = obj2[key];
+    if (_.has(obj1, key) && _.has(obj2, key) && value1 === value2) {
+      acc.push({ key, value: value1, mod: 'unchanged' });
+      return acc;
+    }
+    if (_.has(obj1, key) && _.has(obj2, key) && value1 !== value2) {
+      acc.push({ key, value: value1, mod: 'deleted' });
+      acc.push({ key, value: value2, mod: 'added' });
+      return acc;
+    }
+    if (value1 === undefined) {
+      acc.push({ key, value: value2, mod: 'added' });
+      return acc;
+    }
+
+    acc.push({ key, value: value1, mod: 'deleted' });
+    return acc;
   };
 
   let result = [];
-  let keysObj1 = Object.keys(obj1);
-  let keysObj2 = Object.keys(obj2);
-  keysObj1 = keysObj1.sort();
-  keysObj2 = keysObj2.sort();
-  result = keysObj1.reduce(getResultObj1, result);
-  result = keysObj2.reduce(getResultObj2, result);
+  let keysObj = Object.keys(obj);
+  keysObj = keysObj.sort();
+  result = keysObj.reduce(getResultObj, []);
   return result;
 };
 
