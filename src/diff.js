@@ -6,16 +6,16 @@ const getStringResult = (arr, space = '') => {
   const result = arr.reduce((acc, a) => {
     switch (a.mod) {
       case 'unchanged':
-        return `${acc}${formatting}  ${a.key}: ${a.value}\n`;
+        return `${acc}${space}    ${a.key}: ${a.value}\n`;
       case 'added':
-        return `${acc}${formatting}+ ${a.key}: ${a.value}\n`;
+        return `${acc}${space}  + ${a.key}: ${a.value}\n`;
       case 'deleted':
-        return `${acc}${formatting}- ${a.key}: ${a.value}\n`;
+        return `${acc}${space}  - ${a.key}: ${a.value}\n`;
       default:
-        return `${acc}${formatting}  ${a.key}: ${getStringResult(a.value, formatting)}\n`;
+        return `${acc}${space}    ${a.key}: ${getStringResult(a.value, formatting)}\n`;
     }
   }, '{\n');
-  return `${result}${formatting}}`;
+  return `${result}${space}}`;
 };
 
 const mergeObjects = (obj1, obj2) => {
@@ -28,7 +28,6 @@ const diffFlatObject = (obj1, obj2) => {
   const reduceFunc = (acc, key) => {
     const value1 = obj1[key];
     const value2 = obj2[key];
-    console.log('\n', 'key', key, '\nvalue1: ', value1, '\n', 'value2: ', value2);
     if (value1 !== null && value2 !== null) {
       if (typeof value1 === 'object' && typeof value2 === 'object') {
         acc.push({ key, value: diffFlatObject(value1, value2), mod: 'node' });
@@ -60,13 +59,10 @@ const diffFlatObject = (obj1, obj2) => {
     return acc;
   };
 
-  console.log('1\n', obj1, '2\n', obj2);
   const obj = mergeObjects(obj1, obj2);
-  console.log('merdge', obj);
 
   const keysObj = Object.keys(obj).sort();
   const result = keysObj.reduce(reduceFunc, []);
-  // console.log(result);
   return result;
 };
 
