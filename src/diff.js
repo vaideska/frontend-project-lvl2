@@ -1,30 +1,48 @@
 import _ from 'lodash';
 import getObject from './parsers.js';
 
-const getStringResult = (arr) => {
+const getStringResult = (arr, space = '') => {
+  const formatting = `${space}    `;
   const result = arr.reduce((acc, a) => {
     switch (a.mod) {
       case 'unchanged':
-        return `${acc}    ${a.key}: ${a.value}\n`;
+        return `${acc}${formatting}  ${a.key}: ${a.value}\n`;
       case 'added':
-        return `${acc}  + ${a.key}: ${a.value}\n`;
+        return `${acc}${formatting}+ ${a.key}: ${a.value}\n`;
       case 'deleted':
-        return `${acc}  - ${a.key}: ${a.value}\n`;
+        return `${acc}${formatting}- ${a.key}: ${a.value}\n`;
       default:
-        return null;
+        return `${acc}${formatting}  ${a.key}: ${getStringResult(a.value, formatting)}\n`;
     }
   }, '{\n');
-  return `${result}}`;
+  return `${result}${formatting}}`;
+};
+
+const mergeObjects = (obj1, obj2) => {
+  const obj = JSON.parse(JSON.stringify(obj2));
+  _.merge(obj, obj1);
+  return obj;
 };
 
 const diffFlatObject = (obj1, obj2) => {
-  const obj = { ...obj2 };
-  _.merge(obj, obj1);
-  console.log(obj);
-
-  const getResultObj = (acc, key) => {
+  const reduceFunc = (acc, key) => {
     const value1 = obj1[key];
     const value2 = obj2[key];
+    console.log('\n', 'key', key, '\nvalue1: ', value1, '\n', 'value2: ', value2);
+    if (value1 !== null && value2 !== null) {
+      if (typeof value1 === 'object' && typeof value2 === 'object') {
+        acc.push({ key, value: diffFlatObject(value1, value2), mod: 'node' });
+        return acc;
+      }
+      if (typeof value1 === 'object' && typeof value2 !== 'object') {
+        acc.push({ key, value: diffFlatObject(value1, value1), mod: 'node' });
+        return acc;
+      }
+      if (typeof value1 !== 'object' && typeof value2 === 'object') {
+        acc.push({ key, value: diffFlatObject(value2, value2), mod: 'node' });
+        return acc;
+      }
+    }
     if (_.has(obj1, key) && _.has(obj2, key) && value1 === value2) {
       acc.push({ key, value: value1, mod: 'unchanged' });
       return acc;
@@ -38,15 +56,17 @@ const diffFlatObject = (obj1, obj2) => {
       acc.push({ key, value: value2, mod: 'added' });
       return acc;
     }
-
     acc.push({ key, value: value1, mod: 'deleted' });
     return acc;
   };
 
-  let result = [];
-  let keysObj = Object.keys(obj);
-  keysObj = keysObj.sort();
-  result = keysObj.reduce(getResultObj, []);
+  console.log('1\n', obj1, '2\n', obj2);
+  const obj = mergeObjects(obj1, obj2);
+  console.log('merdge', obj);
+
+  const keysObj = Object.keys(obj).sort();
+  const result = keysObj.reduce(reduceFunc, []);
+  // console.log(result);
   return result;
 };
 
