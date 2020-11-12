@@ -10,7 +10,12 @@ const getYAMLObject = (text) => yaml.safeLoad(text);
 
 const getObject = (filePath) => {
   const format = path.extname(filePath);
-  const text = fs.readFileSync(getNormalPath(filePath), 'utf8');
+  let text;
+  try {
+    text = fs.readFileSync(getNormalPath(filePath), 'utf8');
+  } catch (e) {
+    throw new Error('Not found file');
+  }
 
   switch (format) {
     case '.json':
@@ -18,7 +23,7 @@ const getObject = (filePath) => {
     case '.yml':
       return getYAMLObject(text);
     default:
-      throw new Error('Not fount format');
+      throw new Error('Not found format');
   }
 };
 
