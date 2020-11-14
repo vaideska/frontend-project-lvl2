@@ -21,30 +21,34 @@ const diffObject = (obj1, obj2) => {
         return acc;
       }
       if (typeof value1 === 'object' && typeof value2 !== 'object') {
+        if (_.has(obj2, key)) {
+          acc.push({
+            key,
+            newValue: value2,
+            oldValue: diffObject(value1, value1),
+            change: 'changed',
+            mod: 'node',
+          });
+          return acc;
+        }
         acc.push({
           key,
           value: diffObject(value1, value1),
           change: 'deleted',
           mod: 'node',
         });
-        if (_.has(obj2, key)) {
-          acc.push({
-            key,
-            value: value2,
-            change: 'added',
-            mod: 'leaf',
-          });
-        }
         return acc;
       }
       if (typeof value1 !== 'object' && typeof value2 === 'object') {
         if (_.has(obj1, key)) {
           acc.push({
             key,
-            value: value1,
-            change: 'deleted',
-            mod: 'leaf',
+            newValue: diffObject(value2, value2),
+            oldValue: value1,
+            change: 'changed',
+            mod: 'node',
           });
+          return acc;
         }
         acc.push({
           key,
@@ -67,19 +71,14 @@ const diffObject = (obj1, obj2) => {
     if (_.has(obj1, key) && _.has(obj2, key) && value1 !== value2) {
       acc.push({
         key,
-        value: value1,
-        change: 'deleted',
-        mod: 'leaf',
-      });
-      acc.push({
-        key,
-        value: value2,
-        change: 'added',
+        oldValue: value1,
+        newValue: value2,
+        change: 'changed',
         mod: 'leaf',
       });
       return acc;
     }
-    if (value1 === undefined) {
+    if (!_.has(obj1, key)) {
       acc.push({
         key,
         value: value2,

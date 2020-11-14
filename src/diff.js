@@ -1,5 +1,5 @@
 import getObject from './parsers.js';
-import getStringResult from './formatter.js';
+import getStringResult from './formatters/index.js';
 import diffObject from './buildDiffObject.js';
 
 const diffFiles = (filepath1, filepath2, format) => {
