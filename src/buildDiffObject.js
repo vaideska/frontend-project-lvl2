@@ -7,7 +7,7 @@ const mergeObjects = (obj1, obj2) => {
 };
 
 const diffObject = (obj1, obj2) => {
-  const reduceFunc = (acc, key) => {
+  const buildNode = (acc, key) => {
     const value1 = obj1[key];
     const value2 = obj2[key];
     if (value1 !== null && value2 !== null) {
@@ -21,11 +21,12 @@ const diffObject = (obj1, obj2) => {
         return acc;
       }
       if (typeof value1 === 'object' && typeof value2 !== 'object') {
+        const treeChild = diffObject(value1, value1);
         if (_.has(obj2, key)) {
           acc.push({
             key,
             newValue: value2,
-            oldValue: diffObject(value1, value1),
+            oldValue: treeChild,
             change: 'changed',
             mod: 'node',
           });
@@ -33,17 +34,18 @@ const diffObject = (obj1, obj2) => {
         }
         acc.push({
           key,
-          value: diffObject(value1, value1),
+          value: treeChild,
           change: 'deleted',
           mod: 'node',
         });
         return acc;
       }
       if (typeof value1 !== 'object' && typeof value2 === 'object') {
+        const treeChild = diffObject(value2, value2);
         if (_.has(obj1, key)) {
           acc.push({
             key,
-            newValue: diffObject(value2, value2),
+            newValue: treeChild,
             oldValue: value1,
             change: 'changed',
             mod: 'node',
@@ -52,7 +54,7 @@ const diffObject = (obj1, obj2) => {
         }
         acc.push({
           key,
-          value: diffObject(value2, value2),
+          value: treeChild,
           change: 'added',
           mod: 'node',
         });
@@ -103,7 +105,7 @@ const diffObject = (obj1, obj2) => {
     const obj = mergeObjects(obj1, obj2);
     keysObj = Object.keys(obj).sort();
   }
-  const result = keysObj.reduce(reduceFunc, []);
+  const result = keysObj.reduce(buildNode, []);
   return result;
 };
 

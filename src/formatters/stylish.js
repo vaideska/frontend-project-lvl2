@@ -1,34 +1,34 @@
-const getStringResultStylish = (arr, space = '') => {
+const getStringResultStylish = (tree, space = '') => {
   const formatting = `${space}    `;
-  const result = arr.reduce((acc, a) => {
-    if (a.mod === 'node') {
-      switch (a.change) {
+  const result = tree.reduce((acc, node) => {
+    if (node.mod === 'node') {
+      switch (node.change) {
         case 'added':
-          return `${acc}${space}  + ${a.key}: ${getStringResultStylish(a.value, formatting)}\n`;
+          return `${acc}${space}  + ${node.key}: ${getStringResultStylish(node.value, formatting)}\n`;
         case 'deleted':
-          return `${acc}${space}  - ${a.key}: ${getStringResultStylish(a.value, formatting)}\n`;
+          return `${acc}${space}  - ${node.key}: ${getStringResultStylish(node.value, formatting)}\n`;
         case 'changed': {
           let newValue;
           let oldValue;
-          if (typeof a.newValue === 'object' && a.newValue !== null) newValue = getStringResultStylish(a.newValue, formatting);
-          else newValue = a.newValue;
-          if (typeof a.oldValue === 'object' && a.oldValue !== null) oldValue = getStringResultStylish(a.oldValue, formatting);
-          else oldValue = a.oldValue;
-          return `${acc}${space}  - ${a.key}: ${oldValue}\n${space}  + ${a.key}: ${newValue}\n`;
+          if (typeof node.newValue === 'object' && node.newValue !== null) newValue = getStringResultStylish(node.newValue, formatting);
+          else newValue = node.newValue;
+          if (typeof node.oldValue === 'object' && node.oldValue !== null) oldValue = getStringResultStylish(node.oldValue, formatting);
+          else oldValue = node.oldValue;
+          return `${acc}${space}  - ${node.key}: ${oldValue}\n${space}  + ${node.key}: ${newValue}\n`;
         }
         default:
-          return `${acc}${space}    ${a.key}: ${getStringResultStylish(a.value, formatting)}\n`;
+          return `${acc}${space}    ${node.key}: ${getStringResultStylish(node.value, formatting)}\n`;
       }
     } else {
-      switch (a.change) {
+      switch (node.change) {
         case 'added':
-          return `${acc}${space}  + ${a.key}: ${a.value}\n`;
+          return `${acc}${space}  + ${node.key}: ${node.value}\n`;
         case 'deleted':
-          return `${acc}${space}  - ${a.key}: ${a.value}\n`;
+          return `${acc}${space}  - ${node.key}: ${node.value}\n`;
         case 'changed':
-          return `${acc}${space}  - ${a.key}: ${a.oldValue}\n${space}  + ${a.key}: ${a.newValue}\n`;
+          return `${acc}${space}  - ${node.key}: ${node.oldValue}\n${space}  + ${node.key}: ${node.newValue}\n`;
         default:
-          return `${acc}${space}    ${a.key}: ${a.value}\n`;
+          return `${acc}${space}    ${node.key}: ${node.value}\n`;
       }
     }
   }, '{\n');
