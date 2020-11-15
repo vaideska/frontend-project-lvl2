@@ -38,7 +38,8 @@
 
 <code>
 import genDiff from 'frontend-project-lvl2';
-
-const diff = genDiff(filepath1, filepath2, format);
+<br>
+<br>
+const diff = genDiff(filepath1, filepath2, format);<br>
 console.log(diff);
 </code>
