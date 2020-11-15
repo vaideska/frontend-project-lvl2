@@ -1,4 +1,3 @@
-import { forEach } from 'lodash';
 import diffFiles from '../src/diff.js';
 
 let dataTests;
