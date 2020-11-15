@@ -1,13 +1,19 @@
+import { forEach } from 'lodash';
 import diffFiles from '../src/diff.js';
 
-test('errorFormat', () => {
-  const result = diffFiles('./__tests__/__fixtures__/file1.cfg', './__tests__/__fixtures__/file2.cfg');
-  const error = new Error('Not found format');
-  expect(result).toEqual(error);
+let dataTests;
+
+beforeAll(() => {
+  dataTests = [
+    { file: '.cfg', error: 'Not found format' },
+    { file: '.txt', error: 'Not found file' },
+  ];
 });
 
-test('errorFilePath', () => {
-  const result = diffFiles('./__tests__/__fixtures__/file1.txt', './__tests__/__fixtures__/file2.txt');
-  const error = new Error('Not found file');
-  expect(result).toEqual(error);
+test('errorFormat', () => {
+  dataTests.forEach((data) => {
+    const result = diffFiles(`./__tests__/__fixtures__/file1${data.file}`, `./__tests__/__fixtures__/file2${data.file}`);
+    const error = new Error(data.error);
+    expect(result).toEqual(error);
+  });
 });
