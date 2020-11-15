@@ -20,7 +20,7 @@ beforeAll(() => {
   ];
 });
 
-test('allFormats', () => {
+test('JSONTest', () => {
   dataTests.forEach((data) => {
     const result = diffFiles(`./__tests__/__fixtures__/file1${data.file1}`, `./__tests__/__fixtures__/file2${data.file2}`, data.format);
     const expectResult = fs.readFileSync(`./__tests__/__fixtures__/${data.format}.txt`, 'utf8');
