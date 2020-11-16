@@ -2,15 +2,14 @@
 import program from 'commander';
 import diffFiles from '../src/diff.js';
 
-program.description('Compares two configuration files and shows a difference.');
-program.helpOption('-h, --help', 'read more information');
-program.version('0.0.1', '-v, --version', 'output the version number');
-program.arguments('<filepath1> <filepath2>');
-program.option('-f, --format [type]', 'output format', 'stylish');
-program.action(
-  (filepath1, filepath2) => console.log(diffFiles(filepath1, filepath2, program.format)),
-);
+program
+  .description('Compares two configuration files and shows a difference.')
+  .helpOption('-h, --help', 'read more information')
+  .version('0.0.1', '-v, --version', 'output the version number')
+  .arguments('<filepath1> <filepath2>')
+  .option('-f, --format [type]', 'output format', 'stylish')
+  .action(
+    (filepath1, filepath2) => console.log(diffFiles(filepath1, filepath2, program.format)),
+  );
 
 program.parse(process.argv);
-
-export default diffFiles;

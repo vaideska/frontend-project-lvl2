@@ -22,10 +22,9 @@
 
 <code>
 import genDiff from 'frontend-project-lvl2';<br>
-</code>
-
-
-<code>
+</br>
+</br>
+</br>
 const diff = genDiff(filepath1, filepath2, format);<br>
 console.log(diff);
 </code>

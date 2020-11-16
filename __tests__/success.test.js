@@ -1,29 +1,37 @@
 import fs from 'fs';
-import diffFiles from '../src/diff.js';
+import path from 'path';
+import genDiff from '../bin/index.js';
 
-let dataTests;
+const readFixture = (nameResultFile) => fs.readFileSync(path.resolve('./__tests__/__fixtures__/', `${nameResultFile}.txt`), 'utf8');
 
-beforeAll(() => {
-  dataTests = [
-    { file1: '.json', file2: '.json', format: 'stylish' },
-    { file1: '.json', file2: '.yml', format: 'stylish' },
-    { file1: '.json', file2: '.json', format: 'plain' },
-    { file1: '.json', file2: '.yml', format: 'plain' },
-    { file1: '.json', file2: '.json', format: 'json' },
-    { file1: '.json', file2: '.yml', format: 'json' },
-    { file1: '.yml', file2: '.yml', format: 'stylish' },
-    { file1: '.yml', file2: '.json', format: 'stylish' },
-    { file1: '.yml', file2: '.yml', format: 'plain' },
-    { file1: '.yml', file2: '.json', format: 'plain' },
-    { file1: '.yml', file2: '.yml', format: 'json' },
-    { file1: '.yml', file2: '.json', format: 'json' },
-  ];
+const dataSucessTest = [
+  ['.json', '.json', 'stylish'],
+  ['.json', '.json', 'plain'],
+  ['.json', '.json', 'json'],
+  ['.json', '.yml', 'stylish'],
+  ['.json', '.yml', 'plain'],
+  ['.json', '.yml', 'json'],
+  ['.yml', '.yml', 'stylish'],
+  ['.yml', '.yml', 'plain'],
+  ['.yml', '.yml', 'json'],
+  ['.json', '.json', '', 'stylish'],
+  ['.json', '.yml', '', 'stylish'],
+  ['.yml', '.yml', '', 'stylish'],
+];
+
+const dataErrorTest = [
+  ['.cfg', 'Not found format'],
+  ['.txt', 'Not found file'],
+];
+
+test.each(dataSucessTest)('allFormates', (fileExtension1, fileExtension2, format, nameResultFile = format) => {
+  const result = genDiff(path.resolve('./__tests__/__fixtures__/', `file1${fileExtension1}`), path.resolve('./__tests__/__fixtures__/', `file2${fileExtension2}`), format);
+  const expectResult = readFixture(nameResultFile);
+  expect(result).toEqual(expectResult);
 });
 
-test('allFormats', () => {
-  dataTests.forEach((data) => {
-    const result = diffFiles(`./__tests__/__fixtures__/file1${data.file1}`, `./__tests__/__fixtures__/file2${data.file2}`, data.format);
-    const expectResult = fs.readFileSync(`./__tests__/__fixtures__/${data.format}.txt`, 'utf8');
-    expect(result).toEqual(expectResult);
-  });
+test.each(dataErrorTest)('errorTests', (fileExtension, errorText) => {
+  const result = genDiff(path.resolve('./__tests__/__fixtures__/', `file1${fileExtension}`), path.resolve('./__tests__/__fixtures__/', `file2${fileExtension}`));
+  const error = new Error(errorText);
+  expect(result).toEqual(error);
 });
