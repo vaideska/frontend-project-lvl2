@@ -17,7 +17,18 @@
 
 [![asciicast](https://asciinema.org/a/KoGvhhjKS0ySG8lJr2g2obUel.svg)](https://asciinema.org/a/KoGvhhjKS0ySG8lJr2g2obUel)
 
-### Теперь можно сравнить файлы с разрешениями .json и .yml с разными типами вывода
+### Пакет возможно использовать как библиотеку
+Результат функции - строка.
+
+<code>
+import genDiff from 'frontend-project-lvl2';
+</code>
+<code>
+const diff = genDiff(filepath1, filepath2, format);<br>
+console.log(diff);
+</code>
+
+### Можно сравнить файлы с расширениями .json и .yml с разными типами вывода
 Следующие демонтрации на тестовых файлах из каталога репозитория: `frontend-project-lvl2/__tests__/__fixtures__/`
 Программа работает как с относительными, так и абсолютными путями до файлов.
 
@@ -31,15 +42,4 @@
 
 ## Вывод отличий в json формате: json
 
-[![asciicast](https://asciinema.org/a/o1KFzt6zOnBEp5yN8tsxx7NOs.svg)](https://asciinema.org/a/o1KFzt6zOnBEp5yN8tsxx7NOs)
-
-### Пакет возможно использовать как библиотеку
-Результат функции - строка.
-
-<code>
-import genDiff from 'frontend-project-lvl2';
-<br>
-<br>
-const diff = genDiff(filepath1, filepath2, format);<br>
-console.log(diff);
-</code>
+[![asciicast](https://asciinema.org/a/pc8aDawD9c2qRhq6r1ldQ9exN.svg)](https://asciinema.org/a/pc8aDawD9c2qRhq6r1ldQ9exN)
