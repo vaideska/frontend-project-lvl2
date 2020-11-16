@@ -1,27 +1,26 @@
 const formattingValue = (value) => (typeof value === 'string' ? `"${value}"` : value);
 
-const getStringResultJSON = (tree, space = '') => {
-  const formatting = `${space}    `;
+const getStringResultJSON = (tree) => {
   const result = tree.reduce((acc, node) => {
     if (node.mod === 'node') {
       if (node.change === 'changed') {
         let newValue;
         let oldValue;
-        if (typeof node.newValue === 'object' && node.newValue !== null) newValue = ` ${getStringResultJSON(node.newValue, formatting)}`;
+        if (typeof node.newValue === 'object' && node.newValue !== null) newValue = getStringResultJSON(node.newValue);
         else newValue = formattingValue(node.newValue);
-        if (typeof node.oldValue === 'object' && node.oldValue !== null) oldValue = ` ${getStringResultJSON(node.oldValue, formatting)}`;
+        if (typeof node.oldValue === 'object' && node.oldValue !== null) oldValue = getStringResultJSON(node.oldValue);
         else oldValue = formattingValue(node.oldValue);
-        return `${acc}${space}{\n${space}"change": "changed",\n${space}"key": "${node.key}",\n${space}"oldValue": ${oldValue},\n${space}"newValue": ${newValue}\n${space}},\n`;
+        return `${acc}{"change":"changed","key":"${node.key}","oldValue":${oldValue},"newValue":${newValue}},`;
       }
-      const value = ` ${getStringResultJSON(node.value, formatting)}`;
-      return `${acc}${space}{\n${space}"change": "${node.change}",\n${space}"key": "${node.key}",\n${space}"value": ${value}\n${space}},\n`;
+      const value = getStringResultJSON(node.value);
+      return `${acc}{"change":"${node.change}","key":"${node.key}","value":${value}},`;
     }
     if (node.change === 'changed') {
-      return `${acc}${space}{\n${space}"change": "changed",\n${space}"key": "${node.key}",\n${space}"oldValue": ${formattingValue(node.oldValue)},\n${space}"newValue": ${formattingValue(node.newValue)}},\n`;
+      return `${acc}{"change":"changed","key":"${node.key}","oldValue":${formattingValue(node.oldValue)},"newValue":${formattingValue(node.newValue)}},`;
     }
-    return `${acc}${space}{\n${space}"change": "${node.change}",\n${space}"key": "${node.key}",\n${space}"value": ${formattingValue(node.value)}\n${space}},\n`;
-  }, '[\n');
-  return `${result.substr(0, result.length - 2)}]`;
+    return `${acc}{"change":"${node.change}","key":"${node.key}","value":${formattingValue(node.value)}},`;
+  }, '[');
+  return `${result.substr(0, result.length - 1)}]`;
 };
 
 export default getStringResultJSON;
