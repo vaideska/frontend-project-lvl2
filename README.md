@@ -21,8 +21,10 @@
 Результат функции - строка.
 
 <code>
-import genDiff from 'frontend-project-lvl2';
+import genDiff from 'frontend-project-lvl2';<br>
 </code>
+
+
 <code>
 const diff = genDiff(filepath1, filepath2, format);<br>
 console.log(diff);
