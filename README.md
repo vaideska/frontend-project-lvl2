@@ -20,11 +20,10 @@
 ### Пакет возможно использовать как библиотеку
 Результат функции - строка.
 
-import genDiff from 'frontend-project-lvl2';<br>
+`import genDiff from 'frontend-project-lvl2';`
 
-const diff = genDiff(filepath1, filepath2, format);<br>
-console.log(diff);
 
+`const diff = genDiff(filepath1, filepath2, format);`
 
 ### Можно сравнить файлы с расширениями .json и .yml с разными типами вывода
 Следующие демонтрации на тестовых файлах из каталога репозитория: `frontend-project-lvl2/__tests__/__fixtures__/`
