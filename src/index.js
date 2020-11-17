@@ -1,13 +1,13 @@
-import getObject from './parsers.js';
-import getStringResult from './formatters/index.js';
-import diffObject from './buildDiffObject.js';
+import getObject from './readFile.js';
+import formatResult from './formatters/index.js';
+import getDiffObject from './buildDiff.js';
 
 const genDiff = (filepath1, filepath2, format) => {
   const obj1 = getObject(filepath1);
   const obj2 = getObject(filepath2);
-  const result = diffObject(obj1, obj2);
+  const result = getDiffObject(obj1, obj2);
 
-  return getStringResult(result, format);
+  return formatResult(result, format);
 };
 
 export default genDiff;

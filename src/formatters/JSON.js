@@ -1,18 +1,18 @@
 const formattingValue = (value) => (typeof value === 'string' ? `"${value}"` : value);
 
-const getStringResultJSON = (tree) => {
+const formatToJSON = (tree) => {
   const result = tree.reduce((acc, node) => {
     if (node.mod === 'node') {
       if (node.change === 'changed') {
         let newValue;
         let oldValue;
-        if (typeof node.newValue === 'object' && node.newValue !== null) newValue = getStringResultJSON(node.newValue);
+        if (typeof node.newValue === 'object' && node.newValue !== null) newValue = formatToJSON(node.newValue);
         else newValue = formattingValue(node.newValue);
-        if (typeof node.oldValue === 'object' && node.oldValue !== null) oldValue = getStringResultJSON(node.oldValue);
+        if (typeof node.oldValue === 'object' && node.oldValue !== null) oldValue = formatToJSON(node.oldValue);
         else oldValue = formattingValue(node.oldValue);
         return `${acc}{"change":"changed","key":"${node.key}","oldValue":${oldValue},"newValue":${newValue}},`;
       }
-      const value = getStringResultJSON(node.value);
+      const value = formatToJSON(node.value);
       return `${acc}{"change":"${node.change}","key":"${node.key}","value":${value}},`;
     }
     if (node.change === 'changed') {
@@ -23,4 +23,4 @@ const getStringResultJSON = (tree) => {
   return `${result.substr(0, result.length - 1)}]`;
 };
 
-export default getStringResultJSON;
+export default formatToJSON;

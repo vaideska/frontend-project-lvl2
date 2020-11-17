@@ -1,16 +1,16 @@
-import getStringResultStylish from './stylish.js';
-import getStringResultPlain from './plain.js';
-import getStringResultJSON from './JSON.js';
+import formatToStylish from './stylish.js';
+import formatToPlain from './plain.js';
+import formatToJSON from './JSON.js';
 
-const getStringResult = (arr, format) => {
+const formatResult = (arr, format) => {
   if (format.toLowerCase() === 'plain') {
-    const result = getStringResultPlain(arr);
+    const result = formatToPlain(arr);
     return result.substring(0, result.length - 1);
   }
   if (format.toLowerCase() === 'json') {
-    return getStringResultJSON(arr);
+    return formatToJSON(arr);
   }
-  return getStringResultStylish(arr);
+  return formatToStylish(arr);
 };
 
-export default getStringResult;
+export default formatResult;

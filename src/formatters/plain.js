@@ -1,6 +1,6 @@
 const formattingValue = (value) => (typeof value === 'string' ? `'${value}'` : value);
 
-const getStringResultPlain = (tree, path = '') => {
+const formatToPlain = (tree, path = '') => {
   const result = tree.reduce((acc, node) => {
     if (node.mod === 'node') {
       switch (node.change) {
@@ -21,7 +21,7 @@ const getStringResultPlain = (tree, path = '') => {
           let newPath;
           if (path === '') newPath = node.key;
           else newPath = `${path}.${node.key}`;
-          return `${acc}${getStringResultPlain(node.value, newPath)}`;
+          return `${acc}${formatToPlain(node.value, newPath)}`;
         }
       }
     } else {
@@ -40,4 +40,4 @@ const getStringResultPlain = (tree, path = '') => {
   return result;
 };
 
-export default getStringResultPlain;
+export default formatToPlain;

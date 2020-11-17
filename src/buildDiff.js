@@ -6,7 +6,7 @@ const mergeObjects = (obj1, obj2) => {
   return obj;
 };
 
-const diffObject = (obj1, obj2) => {
+const getDiffObject = (obj1, obj2) => {
   const buildNode = (acc, key) => {
     const value1 = obj1[key];
     const value2 = obj2[key];
@@ -14,14 +14,14 @@ const diffObject = (obj1, obj2) => {
       if (typeof value1 === 'object' && typeof value2 === 'object') {
         acc.push({
           key,
-          value: diffObject(value1, value2),
+          value: getDiffObject(value1, value2),
           change: 'unchanged',
           mod: 'node',
         });
         return acc;
       }
       if (typeof value1 === 'object' && typeof value2 !== 'object') {
-        const treeChild = diffObject(value1, value1);
+        const treeChild = getDiffObject(value1, value1);
         if (_.has(obj2, key)) {
           acc.push({
             key,
@@ -41,7 +41,7 @@ const diffObject = (obj1, obj2) => {
         return acc;
       }
       if (typeof value1 !== 'object' && typeof value2 === 'object') {
-        const treeChild = diffObject(value2, value2);
+        const treeChild = getDiffObject(value2, value2);
         if (_.has(obj1, key)) {
           acc.push({
             key,
@@ -109,4 +109,4 @@ const diffObject = (obj1, obj2) => {
   return result;
 };
 
-export default diffObject;
+export default getDiffObject;

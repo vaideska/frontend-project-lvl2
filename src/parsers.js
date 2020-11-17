@@ -1,30 +1,14 @@
 import yaml from 'js-yaml';
-import fs from 'fs';
-import path from 'path';
 
-const getNormalPath = (filepath) => path.resolve(process.cwd(), filepath);
-
-const getJSONObject = (text) => JSON.parse(text);
-
-const getYAMLObject = (text) => yaml.safeLoad(text);
-
-const getObject = (filePath) => {
-  const format = path.extname(filePath);
-  let text;
-  try {
-    text = fs.readFileSync(getNormalPath(filePath), 'utf8');
-  } catch (e) {
-    throw new Error('Not found file');
-  }
-
+const parse = (format, text) => {
   switch (format) {
     case '.json':
-      return getJSONObject(text);
+      return JSON.parse(text);
     case '.yml':
-      return getYAMLObject(text);
+      return yaml.safeLoad(text);
     default:
       throw new Error('Not found format');
   }
 };
 
-export default getObject;
+export default parse;
