@@ -1,8 +1,15 @@
 import fs from 'fs';
-import path from 'path';
-import genDiff from '../bin/index.js';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+import genDiff from '../src/index.js';
 
-const readFixture = (nameResultFile) => fs.readFileSync(path.resolve('./__tests__/__fixtures__/', `${nameResultFile}.txt`), 'utf8');
+/* eslint-disable no-underscore-dangle */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
+
+const readFixture = (nameResultFile) => fs.readFileSync(getFixturePath(`${nameResultFile}.txt`), 'utf8');
 
 const dataSucessTest = [
   ['.json', '.json', 'stylish'],
@@ -21,7 +28,6 @@ const dataSucessTest = [
 
 const dataErrorTest = [
   ['.cfg', 'Not found format'],
-  ['.txt', 'Not found file'],
 ];
 
 test.each(dataSucessTest)('allFormates', (fileExtension1, fileExtension2, format, nameResultFile = format) => {

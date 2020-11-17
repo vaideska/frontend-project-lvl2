@@ -14,6 +14,10 @@
     "type": "git",
     "url": "git+https://github.com/vaideska/frontend-project-lvl2.git"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {}
+  },
   "author": "",
   "license": "ISC",
   "bugs": {

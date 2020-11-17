@@ -5,6 +5,10 @@ env:
 extends:
   - 'airbnb-base'
   
+# Включает поддержку конструкции import.meta.url
+parserOptions:
+  ecmaVersion: 2020
+
 rules:
   no-console: 0
   import/extensions: 0
