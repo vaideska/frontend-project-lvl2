@@ -7,7 +7,7 @@ const parse = (format, text) => {
     case '.yml':
       return yaml.safeLoad(text);
     default:
-      throw new Error('Not found format');
+      throw new Error();
   }
 };
 
