@@ -17,10 +17,6 @@ const dataSucessTest = [
   ['.yml', '.yml'],
 ];
 
-const dataErrorTest = [
-  ['.cfg', 'Not found format'],
-];
-
 test.each(dataSucessTest)('formatStylish', (fileExtension1, fileExtension2) => {
   const result = genDiff(getFixturePath(`file1${fileExtension1}`), getFixturePath(`file2${fileExtension2}`), '');
   const expectResult = readFixture('stylish');
