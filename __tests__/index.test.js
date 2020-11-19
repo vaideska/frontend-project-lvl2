@@ -35,7 +35,7 @@ test.each(dataSucessTest)('formatJSON', (fileExtension1, fileExtension2) => {
   expect(result).toEqual(expectResult);
 });
 
-test('errorTests', () => {
+test('errorTest', () => {
   const error = new Error('Not found format: cfg');
   expect(() => genDiff(getFixturePath('file1.cfg'), getFixturePath('file2.cfg'))).toThrowError(error);
 });
