@@ -4,9 +4,9 @@
   "description": "",
   "type": "module",
   "bin": {
-    "gendiff": "gendiff.js"
+    "gendiff": "bin/gendiff.js"
   },
-  "main": "/bin/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest"
   },

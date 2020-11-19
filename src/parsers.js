@@ -1,13 +1,13 @@
 import yaml from 'js-yaml';
 
-const parse = (format, text) => {
-  switch (format) {
-    case '.json':
-      return JSON.parse(text);
-    case '.yml':
-      return yaml.safeLoad(text);
+const parse = (type, content) => {
+  switch (type) {
+    case 'json':
+      return JSON.parse(content);
+    case 'yml':
+      return yaml.safeLoad(content);
     default:
-      throw new Error();
+      throw new Error(`Not found format: ${type}`);
   }
 };
 

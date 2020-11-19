@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import program from 'commander';
-import diffFiles from '../src/index.js';
+import diffFiles from '../index.js';
 
 program
   .description('Compares two configuration files and shows a difference.')
