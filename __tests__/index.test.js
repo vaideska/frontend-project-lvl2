@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 const getFixturePath = (filename) => path.join(__dirname, '.', '__fixtures__', filename);
 
-const readFixture = (nameFile) => fs.readFileSync(getFixturePath(`${nameFile}.txt`), 'utf8');
+const readFixture = (filename) => fs.readFileSync(getFixturePath(`${filename}.txt`), 'utf8');
 
 const dataSucessTest = [
   ['.json', '.json'],

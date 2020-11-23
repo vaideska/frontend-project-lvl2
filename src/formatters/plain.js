@@ -1,39 +1,36 @@
+import _ from 'lodash';
+
 const formattingValue = (value) => (typeof value === 'string' ? `'${value}'` : value);
 
 const formatToPlain = (tree, path = '') => {
-  const result = tree.reduce((acc, node) => {
-    if (node.mod === 'node') {
-      switch (node.change) {
-        case 'added':
-          return `${acc}Property '${node.key}' was added with value: [complex value]\n`;
-        case 'deleted':
-          return `${acc}Property '${node.key}' was removed\n`;
-        case 'changed': {
-          let newValue;
-          let oldValue;
-          if (typeof node.newValue === 'object' && node.newValue !== null) newValue = '[complex value]';
-          else newValue = formattingValue(node.newValue);
-          if (typeof node.oldValue === 'object' && node.oldValue !== null) oldValue = '[complex value]';
-          else oldValue = formattingValue(node.oldValue);
-          return `${acc}Property '${path}.${node.key}' was updated. From ${oldValue} to ${newValue}\n`;
+  const result = tree.reduce((acc, element) => {
+    let newPath;
+    if (path === '') newPath = element.key;
+    else newPath = `${path}.${element.key}`;
+
+    if (element.node === 'changed') {
+      let newValue;
+      let oldValue;
+      if (_.isObjectLike(element.newValue)) newValue = '[complex value]';
+      else newValue = formattingValue(element.newValue);
+      if (_.isObjectLike(element.oldValue)) oldValue = '[complex value]';
+      else oldValue = formattingValue(element.oldValue);
+      return `${acc}Property '${newPath}' was updated. From ${oldValue} to ${newValue}\n`;
+    }
+    let value;
+    if (_.isObjectLike(element.value)) value = '[complex value]';
+    else value = formattingValue(element.value);
+
+    switch (element.node) {
+      case 'added':
+        return `${acc}Property '${newPath}' was added with value: ${value}\n`;
+      case 'deleted':
+        return `${acc}Property '${newPath}' was removed\n`;
+      default: {
+        if (_.isObjectLike(element.value)) {
+          return `${acc}${formatToPlain(element.value, newPath)}`;
         }
-        default: {
-          let newPath;
-          if (path === '') newPath = node.key;
-          else newPath = `${path}.${node.key}`;
-          return `${acc}${formatToPlain(node.value, newPath)}`;
-        }
-      }
-    } else {
-      switch (node.change) {
-        case 'added':
-          return `${acc}Property '${path}.${node.key}' was added with value: ${formattingValue(node.value)}\n`;
-        case 'deleted':
-          return `${acc}Property '${path}.${node.key}' was removed\n`;
-        case 'changed':
-          return `${acc}Property '${path}.${node.key}' was updated. From ${formattingValue(node.oldValue)} to ${formattingValue(node.newValue)}\n`;
-        default:
-          return acc;
+        return acc;
       }
     }
   }, '');

@@ -1,111 +1,82 @@
 import _ from 'lodash';
 
-const mergeObjects = (obj1, obj2) => {
-  const obj = JSON.parse(JSON.stringify(obj2));
-  _.merge(obj, obj1);
-  return obj;
-};
-
 const buildTree = (obj1, obj2) => {
-  const buildNode = (acc, key) => {
+  const buildNode = (key) => {
     const value1 = obj1[key];
     const value2 = obj2[key];
-    if (value1 !== null && value2 !== null) {
-      if (typeof value1 === 'object' && typeof value2 === 'object') {
-        acc.push({
+    if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
+      return {
+        key,
+        value: buildTree(value1, value2),
+        node: 'unchanged',
+      };
+    }
+    if (_.isPlainObject(value1) && !_.isPlainObject(value2)) {
+      const treeChild = buildTree(value1, value1);
+      if (_.has(obj2, key)) {
+        return {
           key,
-          value: buildTree(value1, value2),
-          change: 'unchanged',
-          mod: 'node',
-        });
-        return acc;
+          newValue: value2,
+          oldValue: treeChild,
+          node: 'changed',
+        };
       }
-      if (typeof value1 === 'object' && typeof value2 !== 'object') {
-        const treeChild = buildTree(value1, value1);
-        if (_.has(obj2, key)) {
-          acc.push({
-            key,
-            newValue: value2,
-            oldValue: treeChild,
-            change: 'changed',
-            mod: 'node',
-          });
-          return acc;
-        }
-        acc.push({
+      return {
+        key,
+        value: treeChild,
+        node: 'deleted',
+      };
+    }
+    if (!_.isPlainObject(value1) && _.isPlainObject(value2)) {
+      const treeChild = buildTree(value2, value2);
+      if (_.has(obj1, key)) {
+        return {
           key,
-          value: treeChild,
-          change: 'deleted',
-          mod: 'node',
-        });
-        return acc;
+          newValue: treeChild,
+          oldValue: value1,
+          node: 'changed',
+        };
       }
-      if (typeof value1 !== 'object' && typeof value2 === 'object') {
-        const treeChild = buildTree(value2, value2);
-        if (_.has(obj1, key)) {
-          acc.push({
-            key,
-            newValue: treeChild,
-            oldValue: value1,
-            change: 'changed',
-            mod: 'node',
-          });
-          return acc;
-        }
-        acc.push({
-          key,
-          value: treeChild,
-          change: 'added',
-          mod: 'node',
-        });
-        return acc;
-      }
+      return {
+        key,
+        value: treeChild,
+        node: 'added',
+      };
     }
     if (_.has(obj1, key) && _.has(obj2, key) && value1 === value2) {
-      acc.push({
+      return {
         key,
         value: value1,
-        change: 'unchanged',
-        mod: 'leaf',
-      });
-      return acc;
+        node: 'unchanged',
+      };
     }
     if (_.has(obj1, key) && _.has(obj2, key) && value1 !== value2) {
-      acc.push({
+      return {
         key,
         oldValue: value1,
         newValue: value2,
-        change: 'changed',
-        mod: 'leaf',
-      });
-      return acc;
+        node: 'changed',
+      };
     }
     if (!_.has(obj1, key)) {
-      acc.push({
+      return {
         key,
         value: value2,
-        change: 'added',
-        mod: 'leaf',
-      });
-      return acc;
+        node: 'added',
+      };
     }
-    acc.push({
+    return {
       key,
       value: value1,
-      change: 'deleted',
-      mod: 'leaf',
-    });
-    return acc;
+      node: 'deleted',
+    };
   };
 
-  let keysObj;
-  if (obj1 === obj2) {
-    keysObj = Object.keys(obj1);
-  } else {
-    const obj = mergeObjects(obj1, obj2);
-    keysObj = Object.keys(obj).sort();
-  }
-  const result = keysObj.reduce(buildNode, []);
+  const keysObj1 = Object.keys(obj1);
+  const keysObj2 = Object.keys(obj2);
+  let keysObj = _.union(keysObj1, keysObj2);
+  if (obj1 !== obj2) keysObj = keysObj.sort();
+  const result = keysObj.map(buildNode);
   return result;
 };
 

@@ -1,24 +1,22 @@
+import _ from 'lodash';
+
 const formattingValue = (value) => (typeof value === 'string' ? `"${value}"` : value);
 
 const formatToJSON = (tree) => {
-  const result = tree.reduce((acc, node) => {
-    if (node.mod === 'node') {
-      if (node.change === 'changed') {
-        let newValue;
-        let oldValue;
-        if (typeof node.newValue === 'object' && node.newValue !== null) newValue = formatToJSON(node.newValue);
-        else newValue = formattingValue(node.newValue);
-        if (typeof node.oldValue === 'object' && node.oldValue !== null) oldValue = formatToJSON(node.oldValue);
-        else oldValue = formattingValue(node.oldValue);
-        return `${acc}{"change":"changed","key":"${node.key}","oldValue":${oldValue},"newValue":${newValue}},`;
-      }
-      const value = formatToJSON(node.value);
-      return `${acc}{"change":"${node.change}","key":"${node.key}","value":${value}},`;
+  const result = tree.reduce((acc, element) => {
+    if (element.node === 'changed') {
+      let newValue;
+      let oldValue;
+      if (_.isObjectLike(element.newValue)) newValue = formatToJSON(element.newValue);
+      else newValue = formattingValue(element.newValue);
+      if (_.isObjectLike(element.oldValue)) oldValue = formatToJSON(element.oldValue);
+      else oldValue = formattingValue(element.oldValue);
+      return `${acc}{"change":"changed","key":"${element.key}","oldValue":${oldValue},"newValue":${newValue}},`;
     }
-    if (node.change === 'changed') {
-      return `${acc}{"change":"changed","key":"${node.key}","oldValue":${formattingValue(node.oldValue)},"newValue":${formattingValue(node.newValue)}},`;
-    }
-    return `${acc}{"change":"${node.change}","key":"${node.key}","value":${formattingValue(node.value)}},`;
+    let value;
+    if (_.isObjectLike(element.value)) value = formatToJSON(element.value);
+    else value = formattingValue(element.value);
+    return `${acc}{"change":"${element.node}","key":"${element.key}","value":${value}},`;
   }, '[');
   return `${result.substr(0, result.length - 1)}]`;
 };
