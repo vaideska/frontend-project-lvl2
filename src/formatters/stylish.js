@@ -1,31 +1,30 @@
 import _ from 'lodash';
 
+const formattingValue = (value, formatting) => {
+  if (!_.isObjectLike(value)) return value;
+
+  const keys = Object.keys(value);
+  const result = keys.reduce((acc, key) => {
+    if (!_.isObjectLike(value[key])) return `${acc}${formatting}    ${key}: ${value[key]}\n`;
+    return `${acc}${formatting}    ${key}: ${formattingValue(value[key], `${formatting}    `)}\n`;
+  }, '{\n');
+  return `${result}${formatting}}`;
+};
+
 const formatToStylish = (tree, space = '') => {
   const formatting = `${space}    `;
-  const result = tree.reduce((acc, element) => {
-    if (element.node === 'changed') {
-      let newValue;
-      let oldValue;
-      if (_.isObjectLike(element.newValue)) {
-        newValue = formatToStylish(element.newValue, formatting);
-      } else newValue = element.newValue;
-      if (_.isObjectLike(element.oldValue)) {
-        oldValue = formatToStylish(element.oldValue, formatting);
-      } else oldValue = element.oldValue;
-      return `${acc}${space}  - ${element.key}: ${oldValue}\n${space}  + ${element.key}: ${newValue}\n`;
-    }
-    let value;
-    if (_.isObjectLike(element.value)) {
-      value = formatToStylish(element.value, formatting);
-    } else value = element.value;
-
-    switch (element.node) {
-      case 'added':
-        return `${acc}${space}  + ${element.key}: ${value}\n`;
+  const result = tree.reduce((acc, node) => {
+    switch (node.type) {
+      case 'nested':
+        return `${acc}${space}    ${node.key}: ${formatToStylish(node.children, formatting)}\n`;
+      case 'changed':
+        return `${acc}${space}  - ${node.key}: ${formattingValue(node.oldValue, formatting)}\n${space}  + ${node.key}: ${formattingValue(node.newValue, formatting)}\n`;
       case 'deleted':
-        return `${acc}${space}  - ${element.key}: ${value}\n`;
+        return `${acc}${space}  - ${node.key}: ${formattingValue(node.value, formatting)}\n`;
+      case 'added':
+        return `${acc}${space}  + ${node.key}: ${formattingValue(node.value, formatting)}\n`;
       default:
-        return `${acc}${space}    ${element.key}: ${value}\n`;
+        return `${acc}${space}    ${node.key}: ${formattingValue(node.value, formatting)}\n`;
     }
   }, '{\n');
   return `${result}${space}}`;

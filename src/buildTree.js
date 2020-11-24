@@ -5,77 +5,26 @@ const buildTree = (obj1, obj2) => {
     const value1 = obj1[key];
     const value2 = obj2[key];
     if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
-      return {
-        key,
-        value: buildTree(value1, value2),
-        node: 'unchanged',
-      };
+      return { key, children: buildTree(value1, value2), type: 'nested' };
     }
-    if (_.isPlainObject(value1) && !_.isPlainObject(value2)) {
-      const treeChild = buildTree(value1, value1);
-      if (_.has(obj2, key)) {
-        return {
-          key,
-          newValue: value2,
-          oldValue: treeChild,
-          node: 'changed',
-        };
-      }
-      return {
-        key,
-        value: treeChild,
-        node: 'deleted',
-      };
-    }
-    if (!_.isPlainObject(value1) && _.isPlainObject(value2)) {
-      const treeChild = buildTree(value2, value2);
-      if (_.has(obj1, key)) {
-        return {
-          key,
-          newValue: treeChild,
-          oldValue: value1,
-          node: 'changed',
-        };
-      }
-      return {
-        key,
-        value: treeChild,
-        node: 'added',
-      };
-    }
-    if (_.has(obj1, key) && _.has(obj2, key) && value1 === value2) {
-      return {
-        key,
-        value: value1,
-        node: 'unchanged',
-      };
-    }
-    if (_.has(obj1, key) && _.has(obj2, key) && value1 !== value2) {
+    if (_.has(obj1, key) && _.has(obj2, key) && !_.isEqual(value1, value2)) {
       return {
         key,
         oldValue: value1,
         newValue: value2,
-        node: 'changed',
+        type: 'changed',
       };
+    }
+    if (!_.has(obj2, key)) {
+      return { key, value: value1, type: 'deleted' };
     }
     if (!_.has(obj1, key)) {
-      return {
-        key,
-        value: value2,
-        node: 'added',
-      };
+      return { key, value: value2, type: 'added' };
     }
-    return {
-      key,
-      value: value1,
-      node: 'deleted',
-    };
+    return { key, value: value1, type: 'unchanged' };
   };
 
-  const keysObj1 = Object.keys(obj1);
-  const keysObj2 = Object.keys(obj2);
-  let keysObj = _.union(keysObj1, keysObj2);
-  if (obj1 !== obj2) keysObj = keysObj.sort();
+  const keysObj = _.union(Object.keys(obj1), Object.keys(obj2)).sort();
   const result = keysObj.map(buildNode);
   return result;
 };
