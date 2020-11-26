@@ -6,7 +6,7 @@ import buildTree from './src/buildTree.js';
 
 const getFullPath = (filepath) => path.resolve(process.cwd(), filepath);
 
-const genDiff = (filepath1, filepath2, format) => {
+const genDiff = (filepath1, filepath2, format = 'stylish') => {
   const content1 = fs.readFileSync(getFullPath(filepath1), 'utf8');
   const content2 = fs.readFileSync(getFullPath(filepath2), 'utf8');
   const data1 = parse(path.extname(filepath1).slice(1), content1);

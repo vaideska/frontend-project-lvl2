@@ -1,33 +1,44 @@
 import _ from 'lodash';
 
-const formattingValue = (value, formatting) => {
+const space = '    ';
+
+const dataCollection = (indent, key, value, type) => {
+  switch (type) {
+    case 'deleted':
+      return `${indent}  - ${key}: ${value}`;
+    case 'added':
+      return `${indent}  + ${key}: ${value}`;
+    default:
+      return `${indent}    ${key}: ${value}`;
+  }
+};
+
+const formattingValue = (value, depth) => {
   if (!_.isObjectLike(value)) return value;
 
   const keys = Object.keys(value);
-  const result = keys.reduce((acc, key) => {
-    if (!_.isObjectLike(value[key])) return `${acc}${formatting}    ${key}: ${value[key]}\n`;
-    return `${acc}${formatting}    ${key}: ${formattingValue(value[key], `${formatting}    `)}\n`;
-  }, '{\n');
-  return `${result}${formatting}}`;
+  const result = keys.map((key) => {
+    if (!_.isObjectLike(value[key])) return dataCollection(space.repeat(depth), key, value[key]);
+    return dataCollection(space.repeat(depth), key, formattingValue(value[key], depth + 1));
+  });
+  return `{\n${result.join('\n')}\n${space.repeat(depth)}}`;
 };
 
-const formatToStylish = (tree, space = '') => {
-  const formatting = `${space}    `;
-  const result = tree.reduce((acc, node) => {
+const formatToStylish = (tree, depth = 0) => {
+  const result = tree.map((node) => {
     switch (node.type) {
       case 'nested':
-        return `${acc}${space}    ${node.key}: ${formatToStylish(node.children, formatting)}\n`;
+        return dataCollection(space.repeat(depth), node.key,
+          formatToStylish(node.children, depth + 1));
       case 'changed':
-        return `${acc}${space}  - ${node.key}: ${formattingValue(node.oldValue, formatting)}\n${space}  + ${node.key}: ${formattingValue(node.newValue, formatting)}\n`;
-      case 'deleted':
-        return `${acc}${space}  - ${node.key}: ${formattingValue(node.value, formatting)}\n`;
-      case 'added':
-        return `${acc}${space}  + ${node.key}: ${formattingValue(node.value, formatting)}\n`;
+        return [dataCollection(space.repeat(depth), node.key, formattingValue(node.oldValue, depth + 1), 'deleted'),
+          dataCollection(space.repeat(depth), node.key, formattingValue(node.newValue, depth + 1), 'added')];
       default:
-        return `${acc}${space}    ${node.key}: ${formattingValue(node.value, formatting)}\n`;
+        return dataCollection(space.repeat(depth), node.key,
+          formattingValue(node.value, depth + 1), node.type);
     }
-  }, '{\n');
-  return `${result}${space}}`;
+  });
+  return `{\n${result.flat().join('\n')}\n${space.repeat(depth)}}`;
 };
 
 export default formatToStylish;
