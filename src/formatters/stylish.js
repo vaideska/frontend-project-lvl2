@@ -1,44 +1,45 @@
 import _ from 'lodash';
 
-const space = '    ';
-
-const dataCollection = (indent, key, value, type) => {
-  switch (type) {
-    case 'deleted':
-      return `${indent}  - ${key}: ${value}`;
-    case 'added':
-      return `${indent}  + ${key}: ${value}`;
-    default:
-      return `${indent}    ${key}: ${value}`;
-  }
-};
+const symbolSpace = ' ';
+const spaceCount = 4;
+const space = symbolSpace.repeat(spaceCount);
 
 const formattingValue = (value, depth) => {
-  if (!_.isObjectLike(value)) return value;
-
+  if (!_.isObjectLike(value)) {
+    return value;
+  }
   const keys = Object.keys(value);
+
   const result = keys.map((key) => {
-    if (!_.isObjectLike(value[key])) return dataCollection(space.repeat(depth), key, value[key]);
-    return dataCollection(space.repeat(depth), key, formattingValue(value[key], depth + 1));
+    if (!_.isObjectLike(value[key])) {
+      return `${space.repeat(depth)}    ${key}: ${value[key]}`;
+    }
+    return `${space.repeat(depth)}    ${key}: ${formattingValue(value[key], depth + 1)}`;
   });
   return `{\n${result.join('\n')}\n${space.repeat(depth)}}`;
 };
 
-const formatToStylish = (tree, depth = 0) => {
-  const result = tree.map((node) => {
+const formatToStylish = (data) => {
+  const getResult = (tree, depth) => tree.flatMap((node) => {
+    const newDepth = depth + 1;
     switch (node.type) {
       case 'nested':
-        return dataCollection(space.repeat(depth), node.key,
-          formatToStylish(node.children, depth + 1));
+        return `${space.repeat(depth)}    ${node.key}: {\n${getResult(node.children, newDepth).join('\n')}\n${space.repeat(newDepth)}}`;
       case 'changed':
-        return [dataCollection(space.repeat(depth), node.key, formattingValue(node.oldValue, depth + 1), 'deleted'),
-          dataCollection(space.repeat(depth), node.key, formattingValue(node.newValue, depth + 1), 'added')];
+        return [`${space.repeat(depth)}  - ${node.key}: ${formattingValue(node.oldValue, newDepth)}`,
+          `${space.repeat(depth)}  + ${node.key}: ${formattingValue(node.newValue, newDepth)}`];
+      case 'deleted':
+        return `${space.repeat(depth)}  - ${node.key}: ${formattingValue(node.value, newDepth)}`;
+      case 'added':
+        return `${space.repeat(depth)}  + ${node.key}: ${formattingValue(node.value, newDepth)}`;
+      case 'unchanged':
+        return `${space.repeat(depth)}    ${node.key}: ${formattingValue(node.value, newDepth)}`;
       default:
-        return dataCollection(space.repeat(depth), node.key,
-          formattingValue(node.value, depth + 1), node.type);
+        throw new Error(`Wrong node type: ${node.type}!`);
     }
   });
-  return `{\n${result.flat().join('\n')}\n${space.repeat(depth)}}`;
+  const result = getResult(data, 0);
+  return `{\n${result.join('\n')}\n}`;
 };
 
 export default formatToStylish;

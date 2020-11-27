@@ -7,24 +7,27 @@ const formattingValue = (value) => {
   return typeof value === 'string' ? `'${value}'` : value;
 };
 
-const formatToPlain = (tree, path = []) => {
-  const result = tree.map((node) => {
+const formatToPlain = (data) => {
+  const getResult = (tree, path) => tree.flatMap((node) => {
     const newPath = [...path, node.key];
 
     switch (node.type) {
       case 'nested':
-        return formatToPlain(node.children, newPath);
+        return getResult(node.children, newPath);
       case 'added':
         return `Property '${newPath.join('.')}' was added with value: ${formattingValue(node.value)}`;
       case 'deleted':
         return `Property '${newPath.join('.')}' was removed`;
       case 'changed':
         return `Property '${newPath.join('.')}' was updated. From ${formattingValue(node.oldValue)} to ${formattingValue(node.newValue)}`;
+      case 'unchanged':
+        return [];
       default:
-        return '';
+        throw new Error(`Wrong node type: ${node.type}!`);
     }
   });
-  return result.filter((elem) => elem !== '').join('\n');
+  const result = getResult(data, []);
+  return result.join('\n');
 };
 
 export default formatToPlain;

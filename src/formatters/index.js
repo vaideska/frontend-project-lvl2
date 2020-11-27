@@ -8,8 +8,10 @@ const formatResult = (data, format) => {
       return formatToPlain(data);
     case 'json':
       return formatToJSON(data);
-    default:
+    case 'stylish':
       return formatToStylish(data);
+    default:
+      throw new Error(`Not found format: ${format}`);
   }
 };
 
