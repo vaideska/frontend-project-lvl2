@@ -4,7 +4,7 @@ const formattingValue = (value) => {
   if (_.isObjectLike(value)) {
     return '[complex value]';
   }
-  return typeof value === 'string' ? `'${value}'` : value;
+  return _.isString(value) ? `'${value}'` : value;
 };
 
 const formatToPlain = (data) => {
